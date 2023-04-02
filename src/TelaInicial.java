@@ -13,17 +13,17 @@ public class TelaInicial extends JFrame{
     private JButton btnRecuperarSenha;
     private JButton btnCadastro;
     private JPanel PNLTelaInicial;
+    private JTextField TextErroLogar;
+    public static String cpf;
 
-    final String URL = "jdbc:mysql://localhost:3306/bancoOrion";
-    final String USER = "root";
-    final String PASSWORD = "root";
-    final String ValidaUsuario = "SELECT * FROM usuario WHERE CPF = ? AND senha = ?";
+    private Bd bd = new Bd();
 
 
 public TelaInicial() {
     AddListeners();
     IniciarComponentes();
     Conecta();
+    TextErroLogar.setVisible(false);
 }
 
     private void AddListeners() {
@@ -35,23 +35,31 @@ public TelaInicial() {
                 dispose();
             }
         });
+        btnRecuperarSenha.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TelaEsqueceuSenha esqueceuSenha = new TelaEsqueceuSenha();
+                esqueceuSenha.setVisible(true);
+                dispose();
+            }
+        });
     }
 
     public void Conecta() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            Connection connection = DriverManager.getConnection(bd.URL, bd.USER, bd.PASSWORD);
             System.out.println("Conectado");
 
             final PreparedStatement stmtValidar;
 
-            stmtValidar = connection.prepareStatement(ValidaUsuario);
+            stmtValidar = connection.prepareStatement(bd.ValidaUsuario);
 
             btnLogar.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
 
-                    String cpf = TextCPF.getText();
+                    cpf = TextCPF.getText();
                     int senha = Integer.parseInt(PassSenha.getText());
                     try{
                         stmtValidar.setString(1, cpf);
@@ -70,9 +78,10 @@ public TelaInicial() {
                         if (count > 0) {
                             System.out.println("Usuário autenticado com sucesso!");
                             TelaPrincipal home = new TelaPrincipal();
-                            home.setVisible(true);
                             dispose();
+                            home.setVisible(true);
                         } else {
+                            TextErroLogar.setVisible(true);
                             System.out.println("Usuário ou senha inválidos.");
                         }
 
@@ -88,11 +97,12 @@ public TelaInicial() {
 
     public void IniciarComponentes(){
         JPanel TelaInicial = new JPanel();
-        setSize(1000, 750);
+        setExtendedState(MAXIMIZED_BOTH);
         setContentPane(PNLTelaInicial);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Orion Bank");
+        setTitle("Bem vindo - Orion Bank");
         setVisible(true);
+
     }
     public static void main(String[] args) {
         TelaInicial TelaCadAluno = new TelaInicial();
