@@ -49,7 +49,7 @@ public TelaInicial() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             Connection connection = DriverManager.getConnection(bd.URL, bd.USER, bd.PASSWORD);
-            System.out.println("Conectado");
+            System.out.println("Conectado tela inicial");
 
             final PreparedStatement stmtValidar;
 

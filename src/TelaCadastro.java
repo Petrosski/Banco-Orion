@@ -15,8 +15,8 @@ public class TelaCadastro extends JFrame{
     public static String sobrenomeCliente;
     public static String cpfCliente;
     public static String emailCliente;
-    public static String senhaCliente;
-    public static String confirmaSenhaCliente;
+    public String senhaCliente;
+    public String confirmaSenhaCliente;
 
     public TelaCadastro() {
         AddListeners();
@@ -33,9 +33,13 @@ public class TelaCadastro extends JFrame{
                     emailCliente = TextEmail.getText();
                     senhaCliente = TextSenha.getText();
                     confirmaSenhaCliente = TextConfirmeSenha.getText();
-                    TelaCadEndereco telaCadEndereco = new TelaCadEndereco();
-                    telaCadEndereco.setVisible(true);
-                    dispose();
+                    if (senhaCliente.equals(confirmaSenhaCliente)) {
+                        TelaCadEndereco telaCadEndereco = new TelaCadEndereco();
+                        telaCadEndereco.setVisible(true);
+                        dispose();
+                    }else {
+                        JOptionPane.showMessageDialog(null, "As senhas não coincidem!");
+                    }
                 }
             });
         }

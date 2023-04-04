@@ -7,7 +7,7 @@ public class Bd {
         final String Consultar = "SELECT * FROM usuario WHERE CPF = ?";
         final String AlteraSenha = "UPDATE usuario SET senha = ? WHERE CPF = ?";
         final String AlteraSaldo = "UPDATE usuario SET saldo = ? WHERE CPF = ?";
-
-        final String RegistrarCliente = "UPDATE ";
-        final String RegistrarEndereco = "UPDATE ";
+        final String ConsultaConta = "SELECT numConta FROM usuario WHERE CPF = ?";
+        final String RegistrarCliente = "INSERT INTO bancoOrion.usuario (nome, sobrenome, CPF, email, senha) VALUES (?, ?, ?, ?, ?)";
+        final String RegistrarEndereco = "INSERT INTO bancoOrion.endereco (numConta, CEP, cidade, UF, bairro, rua, numeroCasa, complemento) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 }

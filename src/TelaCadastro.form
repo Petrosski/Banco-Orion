@@ -139,7 +139,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Senha:                              "/>
+          <text value="Confirma senha:                              "/>
         </properties>
       </component>
       <hspacer id="15ed1">
