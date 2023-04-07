@@ -13,11 +13,12 @@ public class TelaPrincipal extends JFrame{
     private JMenuItem ItemSair;
     private JMenuItem ItemAlterarSenha;
     private String nome;
+    private Bd bd;
+    private Connection conn;
 
     private TelaInicial telaInicial = new TelaInicial();
     private String cpf = telaInicial.cpf;
 
-    private Bd bd = new Bd();
 
     public TelaPrincipal() {
         AddListeners();
@@ -27,17 +28,14 @@ public class TelaPrincipal extends JFrame{
         public void Conecta(){
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(bd.URL, bd.USER, bd.PASSWORD);
+            this.bd = new Bd();
+            this.conn = this.bd.getConexao();
             System.out.println("Conectado");
 
-            final PreparedStatement stmtConsultar;
-
-
-            stmtConsultar = connection.prepareStatement(bd.Consultar);
+            final PreparedStatement stmt = conn.prepareStatement(bd.Consultar);
             try{
-                stmtConsultar.setString(1, cpf);
-               ResultSet resultado = stmtConsultar.executeQuery();
+                stmt.setString(1, cpf);
+               ResultSet resultado = stmt.executeQuery();
 
                 if (resultado.next()) {
                     nome = resultado.getString("nome");
@@ -62,7 +60,7 @@ public class TelaPrincipal extends JFrame{
 
                 }
             });
-        }catch (SQLException | ClassNotFoundException ex){
+        }catch (SQLException e){
             System.out.println("Erro ao consultar");
         }
     }
@@ -71,10 +69,18 @@ public class TelaPrincipal extends JFrame{
         ItemSair.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showConfirmDialog(null,"Deseja realmente sair?","Confirmação",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
-                TelaInicial telaInicial1 = new TelaInicial();
-                dispose();
-                telaInicial1.setVisible(true);
+                int i = JOptionPane.showConfirmDialog(null,"Deseja realmente sair?","Confirmação",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+                if (i == JOptionPane.YES_OPTION) {
+                    TelaInicial telaInicial1 = new TelaInicial();
+                    dispose();
+                    telaInicial1.setVisible(true);
+                }
+            }
+        });
+        ItemAlterarSenha.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TelaAlterarSenha telaAlterarSenha = new TelaAlterarSenha();
             }
         });
     }

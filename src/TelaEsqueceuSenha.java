@@ -10,7 +10,8 @@ public class TelaEsqueceuSenha extends JFrame {
     private JPanel PNLTelaEsqueceuSenha;
     private JButton voltarButton;
     private JTextField TextErroLogar1;
-    private Bd bd = new Bd();
+    private Bd bd;
+    private Connection conn;
 
     public TelaEsqueceuSenha() {
         AddListeners();
@@ -21,15 +22,13 @@ public class TelaEsqueceuSenha extends JFrame {
     public void Conecta() {
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(bd.URL, bd.USER, bd.PASSWORD);
+            this.bd = new Bd();
+            this.conn = this.bd.getConexao();
             System.out.println("Conectado");
 
-            final PreparedStatement stmtRecuperaSenha;
-            final PreparedStatement stmtAlteraSenha;
+            final PreparedStatement stmtRecuperaSenha = conn.prepareStatement(bd.RecuperaSenha);
+            final PreparedStatement stmtAlteraSenha = conn.prepareStatement(bd.AlteraSenha);
 
-            stmtRecuperaSenha = connection.prepareStatement(bd.RecuperaSenha);
-            stmtAlteraSenha = connection.prepareStatement(bd.AlteraSenha);
             enviarButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -56,14 +55,12 @@ public class TelaEsqueceuSenha extends JFrame {
                             System.out.println("CPF inválido.");
                         }
                     }catch (SQLException ex){
-                        System.out.println("erro ao consultar");
+                        System.out.println("erro ao consultar"+ex.getMessage());
                     }
                 }
             });
-        }catch (SQLException ex){
-            System.out.println("Erro ao conectar");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        }catch (SQLException e){
+            System.out.println("Erro ao conectar"+ e.getMessage());
         }
     }
 

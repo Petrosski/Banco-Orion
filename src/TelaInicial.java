@@ -2,11 +2,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-
-import static java.lang.String.valueOf;
-
 public class TelaInicial extends JFrame{
-
     private JTextField TextCPF;
     private JPasswordField PassSenha;
     private JButton btnLogar;
@@ -15,17 +11,14 @@ public class TelaInicial extends JFrame{
     private JPanel PNLTelaInicial;
     private JTextField TextErroLogar;
     public static String cpf;
-
-    private Bd bd = new Bd();
-
-
+    private Bd bd;
+    private Connection conn;
 public TelaInicial() {
     AddListeners();
     IniciarComponentes();
     Conecta();
     TextErroLogar.setVisible(false);
 }
-
     private void AddListeners() {
         btnCadastro.addActionListener(new ActionListener() {
             @Override
@@ -44,47 +37,44 @@ public TelaInicial() {
             }
         });
     }
-
     public void Conecta() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(bd.URL, bd.USER, bd.PASSWORD);
+            this.bd = new Bd();
+            this.conn = this.bd.getConexao();
             System.out.println("Conectado tela inicial");
-
-            final PreparedStatement stmtValidar;
-
-            stmtValidar = connection.prepareStatement(bd.ValidaUsuario);
-
+            final PreparedStatement stmt = this.conn.prepareStatement(bd.ValidaUsuario);
             btnLogar.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-
                     cpf = TextCPF.getText();
                     int senha = Integer.parseInt(PassSenha.getText());
                     try{
-                        stmtValidar.setString(1, cpf);
-                        stmtValidar.setInt(2,senha);
-
-                        ResultSet rs = stmtValidar.executeQuery();
+                        stmt.setString(1, cpf);
+                        stmt.setInt(2,senha);
+                        ResultSet rs = stmt.executeQuery();
                         System.out.println("dados consultado");
                         System.out.println(cpf);
                         System.out.println(senha);
-
                         int count = 0;
                         while (rs.next()) {
                             count = 1;
                         }
-
                         if (count > 0) {
-                            System.out.println("Usuário autenticado com sucesso!");
-                            TelaPrincipal home = new TelaPrincipal();
-                            dispose();
-                            home.setVisible(true);
-                        } else {
+                            if (cpf.equals("admin")){
+                                TelaAdmin telaAdmin;
+                                telaAdmin = new TelaAdmin();
+                                telaAdmin.setVisible(true);
+                                dispose();
+                            }else {
+                                System.out.println("Usuário autenticado com sucesso!");
+                                TelaPrincipal home = new TelaPrincipal();
+                                home.setVisible(true);
+                                dispose();
+                            }
+                        }else {
                             TextErroLogar.setVisible(true);
                             System.out.println("Usuário ou senha inválidos.");
                         }
-
                     } catch (SQLException ex) {
                         System.out.println("Erro ao consultar");
                     }
@@ -94,7 +84,6 @@ public TelaInicial() {
             System.out.println("Erro ao conectar ao banco de dados");
         }
     }
-
     public void IniciarComponentes(){
         JPanel TelaInicial = new JPanel();
         setExtendedState(MAXIMIZED_BOTH);
@@ -102,7 +91,6 @@ public TelaInicial() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Bem vindo - Orion Bank");
         setVisible(true);
-
     }
     public static void main(String[] args) {
         TelaInicial TelaCadAluno = new TelaInicial();

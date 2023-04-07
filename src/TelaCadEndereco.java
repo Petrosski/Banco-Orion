@@ -13,68 +13,54 @@ public class TelaCadEndereco extends JFrame{
     private JButton btnRegistrar;
     private JTextField TextComplemento;
     private JPanel PNLTelaCadEndereco;
-    private Integer numConta;
+    private JButton btnVoltar;
+    private String codigomax;
 
     private TelaCadastro telaCadastro = new TelaCadastro();
-    String nome = telaCadastro.nomeCliente;
-    String sobrenome = telaCadastro.sobrenomeCliente;
-    String cpf = telaCadastro.cpfCliente;
-    String email = telaCadastro.emailCliente;
-    String senha = telaCadastro.senhaCliente;
-    private Bd bd = new Bd();
-
-    public TelaCadEndereco() {
-        IniciarComponentes();
+    private String cpf = telaCadastro.cpfCliente;
+    private Bd bd;
+    private Connection conn;
+    TelaCadEndereco() {
         IniciarComponentes();
         Conecta();
     }
 
    public void Conecta(){
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(bd.URL, bd.USER, bd.PASSWORD);
+            btnVoltar.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    TelaCadastro cadastro = new TelaCadastro();
+                    cadastro.setVisible(true);
+                    dispose();
+                }
+            });
+            this.bd = new Bd();
+            this.conn = this.bd.getConexao();
             System.out.println("Conectado tela endereço");
 
-            final PreparedStatement stmtRegistrarCliente;
-            stmtRegistrarCliente = connection.prepareStatement(bd.RegistrarCliente);
             final PreparedStatement stmtRegistrarEndereco;
-            stmtRegistrarEndereco = connection.prepareStatement(bd.RegistrarEndereco);
+            stmtRegistrarEndereco = conn.prepareStatement(bd.RegistrarEndereco);
             final PreparedStatement stmtConsultaConta;
-            stmtConsultaConta = connection.prepareStatement(bd.ConsultaConta);
+            stmtConsultaConta = conn.prepareStatement(bd.ConsultaConta);
             btnRegistrar.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String cep = TextCEP.getText();
                     String cidade = TextCidade.getText();
                     String uf = TextUF.getText();
-                    String  bairro = TextBairro.getText();
+                    String bairro = TextBairro.getText();
                     String rua = TextRua.getText();
                     String numCasa = TextNumCasa.getText();
                     String complemento = TextComplemento.getText();
                     try {
-                        int senhaInt = Integer.parseInt(senha);
-                        stmtRegistrarCliente.setString(1, nome);
-                        stmtRegistrarCliente.setString(2, sobrenome);
-                        stmtRegistrarCliente.setString(3, cpf);
-                        stmtRegistrarCliente.setString(4, email);
-                        stmtRegistrarCliente.setInt(5, senhaInt);
-                        stmtRegistrarCliente.setInt(6, numConta);
-                        int linhasAfetadas = stmtRegistrarCliente.executeUpdate();
-                        System.out.println("Linhas afetadas: " + linhasAfetadas);
-
                         stmtConsultaConta.setString(1, cpf);
                         ResultSet rs1= stmtConsultaConta.executeQuery();
-                        //System.out.println(resultado);
                         if (rs1.next()) {
-                            int codigomax = rs1.getInt("numConta");
+                            codigomax = rs1.getString("numConta");
                         }
-
-                    }catch (SQLException ex){
-                        System.out.println("Erro ao inserir cliente");
-                    }
-                    try {
                         int numCasaInt = Integer.parseInt(numCasa);
-                        stmtRegistrarEndereco.setString(1, cpf);
+                        stmtRegistrarEndereco.setString(1, codigomax);
                         stmtRegistrarEndereco.setString(2, cep);
                         stmtRegistrarEndereco.setString(3, cidade);
                         stmtRegistrarEndereco.setString(4, uf);
@@ -85,9 +71,8 @@ public class TelaCadEndereco extends JFrame{
                         int linhasAfetadas2 = stmtRegistrarEndereco.executeUpdate();
                         System.out.println("Linhas afetadas: " + linhasAfetadas2);
                     }catch (SQLException ex){
-                        System.out.println("Erro ao inserir endereço");
+                        System.out.println("Erro ao inserir endereço"+ex.getMessage());
                     }
-
                     TelaInicial telaInicial = new TelaInicial();
                     telaInicial.setVisible(true);
                     dispose();
@@ -95,12 +80,8 @@ public class TelaCadEndereco extends JFrame{
             });
         } catch (SQLException ex) {
             System.out.println("Erro ao conectar BD");
-        } catch (ClassNotFoundException e) {
-            System.out.println("Erro");
         }
     }
-
-
     public void IniciarComponentes () {
         JPanel TelaCadEndereco = new JPanel();
         setExtendedState(MAXIMIZED_BOTH);
